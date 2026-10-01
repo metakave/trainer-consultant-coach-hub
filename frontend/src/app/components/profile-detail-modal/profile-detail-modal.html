@@ -1,0 +1,195 @@
+<div class="modal-backdrop" *ngIf="profile" (click)="close.emit()">
+  <div class="modal-content animate-fade" (click)="$event.stopPropagation()">
+    <!-- Header banner -->
+    <div class="cover-header" [style.background-image]="'url(' + (profile.coverImage || 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1200&q=80') + ')'">
+      <button class="close-btn" (click)="close.emit()" title="Close modal">✕</button>
+    </div>
+
+    <!-- Main profile info header -->
+    <div class="profile-header-body">
+      <img [src]="profile.avatar" [alt]="profile.name" class="avatar-img" />
+      
+      <div class="header-details">
+        <div class="top-row">
+          <span class="badge-category" [ngClass]="getCategoryBadgeClass(profile.category)">
+            ⚡ {{ profile.category }}
+          </span>
+          <span class="verified-pill" *ngIf="profile.verified">
+            ✓ Verified Expert
+          </span>
+        </div>
+
+        <h2 class="expert-name">{{ profile.name }}</h2>
+        <p class="expert-title">{{ profile.title }}</p>
+        <p class="expert-headline">"{{ profile.headline }}"</p>
+
+        <div class="meta-row">
+          <span>📍 {{ profile.location }}</span>
+          <span>⭐ {{ profile.rating }} ({{ profile.reviewsCount }} reviews)</span>
+          <span>💰 {{ profile.hourlyRate }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Nav Tabs -->
+    <div class="modal-tabs">
+      <button [class.active]="activeTab === 'overview'" (click)="activeTab = 'overview'">Overview & Clients</button>
+      <button [class.active]="activeTab === 'media'" (click)="activeTab = 'media'">Podcasts & Videos</button>
+      <button [class.active]="activeTab === 'inquire'" (click)="activeTab = 'inquire'">Request Consultation</button>
+      <button [class.active]="activeTab === 'claim'" (click)="activeTab = 'claim'">Claim Profile</button>
+    </div>
+
+    <!-- Tab 1: Overview & Clients -->
+    <div class="tab-body" *ngIf="activeTab === 'overview'">
+      <div class="section-box">
+        <h3>Biography & Background</h3>
+        <p class="bio-text">{{ profile.bio }}</p>
+      </div>
+
+      <div class="section-box" *ngIf="profile.clients && profile.clients.length">
+        <h3>Trusted By Enterprise Clients</h3>
+        <div class="clients-grid">
+          <span class="client-badge" *ngFor="let client of profile.clients">
+            🏢 {{ client }}
+          </span>
+        </div>
+      </div>
+
+      <div class="section-box" *ngIf="profile.specialties && profile.specialties.length">
+        <h3>Core Specialties</h3>
+        <div class="tags-row">
+          <span class="tag-pill" *ngFor="let spec of profile.specialties">#{{ spec }}</span>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <h3>Public Profiles & Social Links</h3>
+        <div class="social-links-grid">
+          <a *ngIf="profile.socialLinks?.linkedin" [href]="profile.socialLinks.linkedin" target="_blank" class="social-link-card linkedin">
+            <span class="icon">in</span>
+            <span>LinkedIn Profile</span>
+          </a>
+          <a *ngIf="profile.socialLinks?.youtube" [href]="profile.socialLinks.youtube" target="_blank" class="social-link-card youtube">
+            <span class="icon">▶</span>
+            <span>YouTube Channel</span>
+          </a>
+          <a *ngIf="profile.socialLinks?.podcast" [href]="profile.socialLinks.podcast" target="_blank" class="social-link-card podcast">
+            <span class="icon">🎙️</span>
+            <span>Podcast Channel</span>
+          </a>
+          <a *ngIf="profile.socialLinks?.facebook" [href]="profile.socialLinks.facebook" target="_blank" class="social-link-card facebook">
+            <span class="icon">f</span>
+            <span>Facebook Page</span>
+          </a>
+          <a *ngIf="profile.socialLinks?.website" [href]="profile.socialLinks.website" target="_blank" class="social-link-card website">
+            <span class="icon">🌐</span>
+            <span>Official Website</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Media & Podcasts -->
+    <div class="tab-body" *ngIf="activeTab === 'media'">
+      <div class="section-box" *ngIf="profile.featuredMedia?.youtubeVideoId">
+        <h3>Keynote & Workshop Preview</h3>
+        <div class="video-container">
+          <iframe 
+            [src]="getSafeYoutubeUrl(profile.featuredMedia?.youtubeVideoId)" 
+            frameborder="0" 
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+            allowfullscreen>
+          </iframe>
+        </div>
+      </div>
+
+      <div class="section-box">
+        <h3>Featured Podcast Appearances</h3>
+        <div class="podcast-player-box" *ngIf="profile.socialLinks?.podcast">
+          <div class="podcast-info">
+            <span class="podcast-icon">🎙️</span>
+            <div>
+              <h4>{{ profile.featuredMedia?.podcastTitle || 'Featured Executive Podcast Episode' }}</h4>
+              <p>Listen on Apple Podcasts, Spotify or Web RSS</p>
+            </div>
+          </div>
+          <a [href]="profile.socialLinks.podcast" target="_blank" class="btn-primary">
+            Listen on Spotify / Apple
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Request Consultation -->
+    <div class="tab-body" *ngIf="activeTab === 'inquire'">
+      <div *ngIf="!inquirySuccess" class="form-container">
+        <h3>Book or Request Consultation with {{ profile.name }}</h3>
+        <p class="form-subtext">Directly reach out to discuss executive coaching, corporate workshops, or advisory retainers.</p>
+
+        <div class="form-group">
+          <label>Your Full Name *</label>
+          <input type="text" [(ngModel)]="clientName" placeholder="e.g. Sarah Jenkins" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Corporate Email *</label>
+          <input type="email" [(ngModel)]="clientEmail" placeholder="sarah@company.com" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Organization / Company</label>
+          <input type="text" [(ngModel)]="organization" placeholder="e.g. Acme Corp / Microsoft" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Message / Objective *</label>
+          <textarea [(ngModel)]="message" rows="4" placeholder="Describe your team training goal, executive coaching need, or keynote date..." class="form-input"></textarea>
+        </div>
+
+        <button class="btn-primary w-full" (click)="submitInquiry()" [disabled]="inquirySubmitting">
+          {{ inquirySubmitting ? 'Sending Request...' : 'Send Inquiry Now 🚀' }}
+        </button>
+      </div>
+
+      <div *ngIf="inquirySuccess" class="success-box">
+        <div class="success-icon">🎉</div>
+        <h3>Inquiry Sent Successfully!</h3>
+        <p>Your request has been delivered to {{ profile.name }}. They will respond to {{ clientEmail }} within 24-48 hours.</p>
+      </div>
+    </div>
+
+    <!-- Tab 4: Claim Profile -->
+    <div class="tab-body" *ngIf="activeTab === 'claim'">
+      <div *ngIf="!claimSuccess" class="form-container">
+        <h3>Is this your public profile?</h3>
+        <p class="form-subtext">Claim this profile to update your clients, social links, bio, and receive direct corporate leads.</p>
+
+        <div class="form-group">
+          <label>Your Name *</label>
+          <input type="text" [(ngModel)]="claimantName" placeholder="Your full name" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Verification Email *</label>
+          <input type="email" [(ngModel)]="claimantEmail" placeholder="yourname@officialdomain.com" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>LinkedIn / Website Verification Link</label>
+          <input type="text" [(ngModel)]="verificationLink" placeholder="https://linkedin.com/in/yourprofile" class="form-input" />
+        </div>
+
+        <button class="btn-ai w-full" (click)="submitClaim()" [disabled]="claimSubmitting">
+          {{ claimSubmitting ? 'Submitting Claim...' : 'Submit Profile Claim Request 🛡️' }}
+        </button>
+      </div>
+
+      <div *ngIf="claimSuccess" class="success-box">
+        <div class="success-icon">✅</div>
+        <h3>Claim Request Submitted</h3>
+        <p>We sent a verification link to <strong>{{ claimantEmail }}</strong>. Follow the link to complete ownership setup.</p>
+      </div>
+    </div>
+
+  </div>
+</div>

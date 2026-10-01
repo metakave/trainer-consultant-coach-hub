@@ -1,0 +1,98 @@
+<div class="modal-backdrop" (click)="close.emit()">
+  <div class="modal-content animate-fade" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>Join Experts Hub Directory</h2>
+      <button class="close-btn" (click)="close.emit()">✕</button>
+    </div>
+
+    <div class="modal-body" *ngIf="!success">
+      <p class="sub-text">Create your public profile as a Corporate Trainer, Coach, Consultant, or AI Trainer to receive high-tier enterprise client inquiries.</p>
+
+      <div class="form-grid">
+        <div class="form-group col-full">
+          <label>Full Name *</label>
+          <input type="text" [(ngModel)]="name" placeholder="e.g. Dr. Jordan Bell" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Primary Category *</label>
+          <select [(ngModel)]="category" class="form-input">
+            <option *ngFor="let cat of categories" [value]="cat">{{ cat }}</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Professional Title</label>
+          <input type="text" [(ngModel)]="title" placeholder="e.g. Senior Executive Leadership Coach" class="form-input" />
+        </div>
+
+        <div class="form-group col-full">
+          <label>Elevator Headline</label>
+          <input type="text" [(ngModel)]="headline" placeholder="e.g. Transforming C-Suite Leadership & Corporate Strategy" class="form-input" />
+        </div>
+
+        <div class="form-group col-full">
+          <label>Biography & Expertise Summary *</label>
+          <textarea [(ngModel)]="bio" rows="4" placeholder="Detail your experience, training methodology, and organizational achievements..." class="form-input"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Corporate Clients (Comma-separated)</label>
+          <input type="text" [(ngModel)]="clientsInput" placeholder="Google, Microsoft, Accenture, Deloitte" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Core Specialties (Comma-separated)</label>
+          <input type="text" [(ngModel)]="specialtiesInput" placeholder="AI Strategy, Executive Presence, Agile Scaling" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Location</label>
+          <input type="text" [(ngModel)]="location" placeholder="e.g. San Francisco, CA & Remote" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Hourly / Retainer Fee Range</label>
+          <input type="text" [(ngModel)]="hourlyRate" placeholder="e.g. $400 - $800 / hr" class="form-input" />
+        </div>
+
+        <div class="form-group col-full">
+          <label>Avatar / Photo Image URL</label>
+          <input type="text" [(ngModel)]="avatar" class="form-input" />
+        </div>
+
+        <!-- Social Links -->
+        <div class="form-group">
+          <label>LinkedIn URL</label>
+          <input type="text" [(ngModel)]="linkedin" placeholder="https://linkedin.com/in/username" class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>YouTube Channel / Video</label>
+          <input type="text" [(ngModel)]="youtube" placeholder="https://youtube.com/..." class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Podcast Link (Spotify / Apple)</label>
+          <input type="text" [(ngModel)]="podcast" placeholder="https://podcasts.apple.com/..." class="form-input" />
+        </div>
+
+        <div class="form-group">
+          <label>Official Website</label>
+          <input type="text" [(ngModel)]="website" placeholder="https://yourwebsite.com" class="form-input" />
+        </div>
+      </div>
+
+      <button class="btn-primary w-full submit-btn" (click)="submitProfile()" [disabled]="isSubmitting">
+        {{ isSubmitting ? 'Creating Profile...' : 'Publish Profile to Directory 🚀' }}
+      </button>
+    </div>
+
+    <div class="modal-body success-body" *ngIf="success">
+      <div class="success-icon">🎉</div>
+      <h3>Profile Published Successfully!</h3>
+      <p>Your profile is now live in the Experts Hub directory.</p>
+      <button class="btn-primary" (click)="close.emit()">View Hub</button>
+    </div>
+  </div>
+</div>

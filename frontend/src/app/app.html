@@ -1,0 +1,220 @@
+<div class="app-root">
+  <!-- Top Navigation Header -->
+  <header class="top-nav glass-panel">
+    <div class="nav-container">
+      <div class="logo-group">
+        <div class="logo-icon">⚡</div>
+        <div>
+          <h1 class="logo-title">ExpertHub</h1>
+          <span class="logo-subtitle">Trainers • Coaches • Consultants • AI Experts</span>
+        </div>
+      </div>
+
+      <nav class="nav-tabs">
+        <button [class.active]="activeTab === 'explore'" (click)="activeTab = 'explore'">
+          🔍 Explore Experts Directory
+        </button>
+        <button [class.active]="activeTab === 'gather'" (click)="activeTab = 'gather'">
+          ✨ Auto-Gather Public Profile
+        </button>
+        <button [class.active]="activeTab === 'deploy'" (click)="activeTab = 'deploy'">
+          🚀 Vercel & Free DB Setup
+        </button>
+      </nav>
+
+      <div class="nav-actions">
+        <button class="btn-primary" (click)="showAddModal = true">
+          + Add Expert Profile
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main View Container -->
+  <main class="main-content">
+    
+    <!-- Tab 1: Explore Hub -->
+    <ng-container *ngIf="activeTab === 'explore'">
+      <!-- Hero Banner -->
+      <section class="hero-section glass-panel">
+        <div class="hero-content">
+          <span class="hero-pill">GLOBAL EXPERT DIRECTORY & MATCHING PLATFORM</span>
+          <h2 class="hero-title">Discover Top-Tier Corporate Trainers, Coaches & AI Experts</h2>
+          <p class="hero-description">Gathered from verified public sources. Access full profiles, corporate client histories, video keynotes, podcast features, and direct inquiry channels.</p>
+
+          <!-- Search & Filter Bar -->
+          <div class="search-bar-box">
+            <div class="search-input-wrapper">
+              <span class="search-icon">🔍</span>
+              <input 
+                type="text" 
+                [(ngModel)]="searchQuery" 
+                (input)="onSearchChange()"
+                placeholder="Search by expert name, topic (e.g. GenAI, Agile), or corporate client (e.g. Google, McKinsey)..." 
+                class="hero-search-input"
+              />
+              <button class="search-btn" (click)="loadProfiles()">Search</button>
+            </div>
+          </div>
+
+          <!-- Category Filter Tabs -->
+          <div class="category-tabs">
+            <button 
+              *ngFor="let cat of categories" 
+              [class.active]="activeCategory === cat" 
+              (click)="selectCategory(cat)"
+              class="cat-tab-btn"
+            >
+              <span *ngIf="cat === 'All'">🌐 All Experts</span>
+              <span *ngIf="cat === 'Corporate Trainer'">📘 Corporate Trainer</span>
+              <span *ngIf="cat === 'Corporate Coach'">🌱 Corporate Coach</span>
+              <span *ngIf="cat === 'Executive Coach'">👑 Executive Coach</span>
+              <span *ngIf="cat === 'Consultant'">📊 Consultant</span>
+              <span *ngIf="cat === 'AI Trainer'">🤖 AI Trainer</span>
+            </button>
+          </div>
+
+          <!-- Quick Filter Pills (Top Clients & Tags) -->
+          <div class="quick-filters-row">
+            <div class="filter-group">
+              <span class="filter-label">Filter by Client:</span>
+              <button 
+                *ngFor="let client of topClients" 
+                (click)="filterByClient(client)" 
+                [class.active]="selectedClientFilter === client"
+                class="client-filter-chip"
+              >
+                🏢 {{ client }}
+              </button>
+            </div>
+
+            <div class="filter-group">
+              <span class="filter-label">Trending Topics:</span>
+              <button 
+                *ngFor="let tag of popularTags" 
+                (click)="filterByTag(tag)" 
+                class="tag-filter-chip"
+              >
+                #{{ tag }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Profiles Grid Header -->
+      <div class="results-header">
+        <h3>
+          Showing <span class="highlight-count">{{ profiles.length }}</span> Verified Experts
+          <span *ngIf="activeCategory !== 'All'">in {{ activeCategory }}</span>
+        </h3>
+        <span class="live-badge">🟢 Live Data Engine</span>
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="loading-state glass-panel">
+        <div class="pulse-loader"></div>
+        <p>Fetching expert profiles...</p>
+      </div>
+
+      <!-- Experts Grid -->
+      <div *ngIf="!isLoading && profiles.length" class="profiles-grid">
+        <div 
+          *ngFor="let profile of profiles" 
+          class="expert-card glass-panel glass-panel-interactive animate-fade"
+          (click)="openProfile(profile)"
+        >
+          <!-- Featured Badge -->
+          <span *ngIf="profile.featured" class="featured-ribbon">⭐ FEATURED</span>
+
+          <!-- Card Header Avatar & Category -->
+          <div class="card-header">
+            <img [src]="profile.avatar" [alt]="profile.name" class="card-avatar" />
+            <div class="card-meta">
+              <span class="badge-category" [ngClass]="getCategoryBadgeClass(profile.category)">
+                ⚡ {{ profile.category }}
+              </span>
+              <h4 class="card-name">{{ profile.name }}</h4>
+              <p class="card-title">{{ profile.title }}</p>
+            </div>
+          </div>
+
+          <!-- Headline -->
+          <p class="card-headline">"{{ profile.headline }}"</p>
+
+          <!-- Client badges list -->
+          <div class="card-clients" *ngIf="profile.clients?.length">
+            <span class="clients-label">Past Clients:</span>
+            <div class="client-pills-row">
+              <span *ngFor="let client of profile.clients.slice(0, 3)" class="client-pill">
+                {{ client }}
+              </span>
+              <span *ngIf="profile.clients.length > 3" class="client-pill more">
+                +{{ profile.clients.length - 3 }} more
+              </span>
+            </div>
+          </div>
+
+          <!-- Rating & Location Footer -->
+          <div class="card-footer">
+            <div class="rating-box">
+              ⭐ <strong>{{ profile.rating }}</strong>
+              <span class="reviews-count">({{ profile.reviewsCount }})</span>
+            </div>
+
+            <div class="social-mini-icons">
+              <a *ngIf="profile.socialLinks?.linkedin" [href]="profile.socialLinks.linkedin" target="_blank" (click)="$event.stopPropagation()" class="social-icon-btn linkedin" title="LinkedIn">in</a>
+              <a *ngIf="profile.socialLinks?.youtube" [href]="profile.socialLinks.youtube" target="_blank" (click)="$event.stopPropagation()" class="social-icon-btn youtube" title="YouTube">▶</a>
+              <a *ngIf="profile.socialLinks?.podcast" [href]="profile.socialLinks.podcast" target="_blank" (click)="$event.stopPropagation()" class="social-icon-btn podcast" title="Podcast">🎙️</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!isLoading && !profiles.length" class="empty-state glass-panel">
+        <span class="empty-icon">🔎</span>
+        <h3>No Experts Match Your Filter</h3>
+        <p>Try clearing your search query or client filter to discover more leaders.</p>
+        <button class="btn-secondary" (click)="activeCategory = 'All'; searchQuery = ''; selectedClientFilter = ''; loadProfiles()">Reset Filters</button>
+      </div>
+    </ng-container>
+
+    <!-- Tab 2: Public Scraper Studio -->
+    <ng-container *ngIf="activeTab === 'gather'">
+      <app-scraper-studio (profileCreated)="onProfileCreated($event)"></app-scraper-studio>
+    </ng-container>
+
+    <!-- Tab 3: Vercel & Free Database Setup Guide -->
+    <ng-container *ngIf="activeTab === 'deploy'">
+      <app-vercel-guide></app-vercel-guide>
+    </ng-container>
+
+  </main>
+
+  <!-- Profile Detail Drawer / Modal -->
+  <app-profile-detail-modal 
+    *ngIf="selectedProfile" 
+    [profile]="selectedProfile" 
+    (close)="closeProfileModal()"
+  ></app-profile-detail-modal>
+
+  <!-- Add Profile Modal -->
+  <app-add-profile-modal 
+    *ngIf="showAddModal" 
+    (close)="showAddModal = false" 
+    (profileAdded)="onProfileCreated($event)"
+  ></app-add-profile-modal>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <div class="footer-container">
+      <p>© 2026 ExpertHub — Public Intelligence Platform for Corporate Trainers, Coaches, Consultants & AI Trainers.</p>
+      <div class="footer-links">
+        <a (click)="activeTab = 'explore'">Directory</a>
+        <a (click)="activeTab = 'gather'">Auto-Gatherer Engine</a>
+        <a (click)="activeTab = 'deploy'">Vercel Free Deployment</a>
+      </div>
+    </div>
+  </footer>
+</div>

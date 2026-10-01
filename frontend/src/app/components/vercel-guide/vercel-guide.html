@@ -1,0 +1,59 @@
+<div class="guide-container glass-panel animate-fade">
+  <div class="guide-header">
+    <span class="guide-badge">🚀 VERCEL & DATABASE DEPLOYMENT ARCHITECTURE</span>
+    <h2>How to Deploy on Vercel Free Plan + Neon Postgres</h2>
+    <p>This repository is 100% configured for 1-click Vercel Free Tier hosting and Serverless Node API execution paired with Neon / Vercel Postgres free tier database.</p>
+  </div>
+
+  <div class="steps-grid">
+    <!-- Step 1 -->
+    <div class="step-card">
+      <div class="step-number">01</div>
+      <h3>Push Code to GitHub</h3>
+      <p>Commit your workspace files to GitHub or GitLab repository.</p>
+      <div class="code-box">
+        <code>git init && git add . && git commit -m "Initial Experts Hub"</code>
+        <button (click)="copyToClipboard('git init && git add . && git commit -m \'Initial Experts Hub\'', 'step1')" class="copy-btn">
+          {{ copiedSnippet === 'step1' ? 'Copied ✓' : 'Copy' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Step 2 -->
+    <div class="step-card">
+      <div class="step-number">02</div>
+      <h3>Import Project in Vercel</h3>
+      <p>Log in to <a href="https://vercel.com" target="_blank" class="link">vercel.com</a>, click <strong>"Add New Project"</strong> and select your GitHub repo. Vercel automatically detects `vercel.json`!</p>
+    </div>
+
+    <!-- Step 3 -->
+    <div class="step-card">
+      <div class="step-number">03</div>
+      <h3>Provision Free Database (Neon / Vercel Postgres)</h3>
+      <p>In your Vercel Project Dashboard, navigate to <strong>Storage ➔ Connect Database ➔ Neon Postgres (Free)</strong> or <strong>Vercel Postgres (Free)</strong>. Click Create!</p>
+    </div>
+
+    <!-- Step 4 -->
+    <div class="step-card">
+      <div class="step-number">04</div>
+      <h3>Set Environment Variable</h3>
+      <p>Add <code>POSTGRES_URL</code> or <code>DATABASE_URL</code> in Vercel Project Settings ➔ Environment Variables.</p>
+      <div class="code-box">
+        <code>DATABASE_URL="postgres://user:password@ep-sample.neon.tech/neondb?sslmode=require"</code>
+        <button (click)="copyToClipboard('DATABASE_URL=postgres://user:password@ep-sample.neon.tech/neondb?sslmode=require', 'step4')" class="copy-btn">
+          {{ copiedSnippet === 'step4' ? 'Copied ✓' : 'Copy' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="architecture-summary">
+    <h3>⚡ Architecture Highlights</h3>
+    <ul>
+      <li>✅ <strong>Vercel Serverless Functions (`/api`)</strong>: Executes the Node + Express scraping & profile APIs with 0 cost.</li>
+      <li>✅ <strong>Angular 19 Frontend</strong>: Built to static assets and served on Vercel Edge CDN for ultra-fast global load times.</li>
+      <li>✅ <strong>Automatic Cheerio Scraper Engine</strong>: Parses meta tags, OpenGraph images, and social channels on demand.</li>
+      <li>✅ <strong>Neon Postgres Free Tier</strong>: Stores profile claims, client badges, and incoming corporate consultation leads without credit card requirement.</li>
+    </ul>
+  </div>
+</div>

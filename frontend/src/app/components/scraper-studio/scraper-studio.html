@@ -1,0 +1,97 @@
+<div class="scraper-container glass-panel animate-fade">
+  <div class="scraper-header">
+    <div class="header-tag">
+      <span>✨ AUTOMATED PUBLIC DATA AGGREGATOR</span>
+    </div>
+    <h2>Public Source Profile Gatherer</h2>
+    <p>Paste any website URL, LinkedIn link, YouTube channel, or expert name. Our Node engine parses HTML metadata, extracts OpenGraph images, social links, detected clients, and auto-generates a clean profile!</p>
+  </div>
+
+  <!-- Search / Scrape Input Box -->
+  <div class="input-card">
+    <div class="search-input-group">
+      <input 
+        type="text" 
+        [(ngModel)]="targetInput" 
+        (keyup.enter)="runScraper()"
+        placeholder="Paste Website URL, LinkedIn profile, YouTube channel, or Expert Name..." 
+        class="main-scrape-input"
+      />
+      <button class="btn-ai" (click)="runScraper()" [disabled]="isLoading">
+        <span *ngIf="!isLoading">⚡ Gather Profile</span>
+        <span *ngIf="isLoading" class="spinner-text">Scraping & Synthesizing...</span>
+      </button>
+    </div>
+
+    <!-- Options row -->
+    <div class="options-row">
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="autoSave" />
+        <span>Auto-publish gathered profile to public directory</span>
+      </label>
+    </div>
+
+    <!-- Quick Presets -->
+    <div class="presets-box">
+      <span class="preset-label">Try sample source URLs:</span>
+      <div class="preset-pills">
+        <button *ngFor="let sample of presetExamples" (click)="usePreset(sample.url)" class="preset-btn">
+          🔍 {{ sample.name }}
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="errorMessage" class="error-banner">
+      ⚠️ {{ errorMessage }}
+    </div>
+  </div>
+
+  <!-- Scraped Result Preview -->
+  <div *ngIf="scrapedProfile" class="result-card glass-panel animate-fade">
+    <div class="result-header">
+      <div class="header-left">
+        <span class="badge-status">
+          {{ publishedSuccess ? '✅ PUBLISHED TO HUB' : '🔍 DRAFT GENERATED' }}
+        </span>
+        <h3>Extracted Profile Summary</h3>
+      </div>
+      <button *ngIf="!publishedSuccess" class="btn-primary" (click)="publishProfile()">
+        Publish to Directory 🚀
+      </button>
+    </div>
+
+    <div class="profile-preview-grid">
+      <div class="preview-avatar-box">
+        <img [src]="scrapedProfile.avatar" [alt]="scrapedProfile.name" class="preview-avatar" />
+        <div class="category-badge-box">
+          <span class="badge-category badge-ai-trainer">⚡ {{ scrapedProfile.category }}</span>
+        </div>
+      </div>
+
+      <div class="preview-info">
+        <h4>{{ scrapedProfile.name }}</h4>
+        <p class="preview-title">{{ scrapedProfile.title }}</p>
+        <p class="preview-bio">{{ scrapedProfile.bio }}</p>
+
+        <div class="extracted-meta">
+          <div class="meta-item">
+            <strong>Detected Clients:</strong>
+            <div class="client-pills">
+              <span *ngFor="let client of scrapedProfile.clients" class="client-badge">🏢 {{ client }}</span>
+            </div>
+          </div>
+
+          <div class="meta-item">
+            <strong>Social & Podcast Links Gathered:</strong>
+            <div class="social-pills">
+              <span *ngIf="scrapedProfile.socialLinks.linkedin" class="social-pill linkedin">LinkedIn</span>
+              <span *ngIf="scrapedProfile.socialLinks.youtube" class="social-pill youtube">YouTube</span>
+              <span *ngIf="scrapedProfile.socialLinks.podcast" class="social-pill podcast">Podcast</span>
+              <span *ngIf="scrapedProfile.socialLinks.facebook" class="social-pill facebook">Facebook</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

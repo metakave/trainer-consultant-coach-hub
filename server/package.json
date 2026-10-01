@@ -1,0 +1,17 @@
+{
+  "name": "trainers-coaches-hub-server",
+  "version": "1.0.0",
+  "description": "Node API & Public Data Scraper Engine for Corporate Trainers, Coaches, Consultants & AI Experts",
+  "main": "index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "node --watch index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.4.5"
+  }
+}
