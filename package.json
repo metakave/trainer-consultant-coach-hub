@@ -1,0 +1,12 @@
+{
+  "name": "trainers-coaches-consultants-hub",
+  "version": "1.0.0",
+  "description": "Hub for Corporate Trainer, Corporate Coach, Executive Coach, Consultants and AI Trainers",
+  "scripts": {
+    "start": "node server/index.js",
+    "server": "npm --prefix server run dev",
+    "client": "npm --prefix frontend start",
+    "dev": "node server/index.js & cd frontend && npx ng serve --port 4200 --open",
+    "build": "cd frontend && npm run build"
+  }
+}
