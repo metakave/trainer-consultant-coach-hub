@@ -25,13 +25,21 @@ import { AddProfileModalComponent } from './components/add-profile-modal/add-pro
 export class App implements OnInit {
   title = 'Experts Hub';
   
-  profiles: ExpertProfile[] = [];
+  rawProfiles: ExpertProfile[] = [];
+  displayedProfiles: ExpertProfile[] = [];
   isLoading = true;
   
   activeTab: 'explore' | 'gather' | 'deploy' = 'explore';
   activeCategory: ExpertCategory = 'All';
   searchQuery = '';
   selectedClientFilter = '';
+
+  // Bookmarks & Favorites
+  savedExpertIds: Set<string> = new Set<string>();
+  showSavedOnly = false;
+
+  // Sorting
+  sortBy: 'featured' | 'rating' | 'reviews' | 'name' = 'featured';
 
   selectedProfile: ExpertProfile | null = null;
   showAddModal = false;
@@ -51,7 +59,43 @@ export class App implements OnInit {
   constructor(private expertService: ExpertService) {}
 
   ngOnInit() {
+    this.loadSavedState();
     this.loadProfiles();
+  }
+
+  loadSavedState() {
+    try {
+      const stored = localStorage.getItem('saved_expert_ids');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        this.savedExpertIds = new Set(parsed);
+      }
+    } catch (e) {
+      console.warn('Could not load saved experts from localStorage');
+    }
+  }
+
+  saveStateToStorage() {
+    try {
+      localStorage.setItem('saved_expert_ids', JSON.stringify(Array.from(this.savedExpertIds)));
+    } catch (e) {
+      console.warn('Could not persist saved experts to localStorage');
+    }
+  }
+
+  toggleSaveExpert(profileId: string, event: MouseEvent) {
+    event.stopPropagation();
+    if (this.savedExpertIds.has(profileId)) {
+      this.savedExpertIds.delete(profileId);
+    } else {
+      this.savedExpertIds.add(profileId);
+    }
+    this.saveStateToStorage();
+    this.applyLocalFiltersAndSorting();
+  }
+
+  isSaved(profileId: string): boolean {
+    return this.savedExpertIds.has(profileId);
   }
 
   loadProfiles() {
@@ -64,12 +108,39 @@ export class App implements OnInit {
     ).subscribe({
       next: (res) => {
         this.isLoading = false;
-        this.profiles = res.profiles || [];
+        this.rawProfiles = res.profiles || [];
+        this.applyLocalFiltersAndSorting();
       },
       error: () => {
         this.isLoading = false;
       }
     });
+  }
+
+  applyLocalFiltersAndSorting() {
+    let result = [...this.rawProfiles];
+
+    if (this.showSavedOnly) {
+      result = result.filter(p => this.savedExpertIds.has(p.id));
+    }
+
+    switch (this.sortBy) {
+      case 'rating':
+        result.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'reviews':
+        result.sort((a, b) => b.reviewsCount - a.reviewsCount);
+        break;
+      case 'name':
+        result.sort((a, b) => a.name.localeCompare(b.name));
+        break;
+      case 'featured':
+      default:
+        result.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+        break;
+    }
+
+    this.displayedProfiles = result;
   }
 
   selectCategory(cat: ExpertCategory) {
@@ -95,6 +166,15 @@ export class App implements OnInit {
     this.loadProfiles();
   }
 
+  onSortChange() {
+    this.applyLocalFiltersAndSorting();
+  }
+
+  toggleSavedOnlyView() {
+    this.showSavedOnly = !this.showSavedOnly;
+    this.applyLocalFiltersAndSorting();
+  }
+
   openProfile(profile: ExpertProfile) {
     this.selectedProfile = profile;
   }
@@ -104,8 +184,9 @@ export class App implements OnInit {
   }
 
   onProfileCreated(newProfile: ExpertProfile) {
-    this.profiles.unshift(newProfile);
+    this.rawProfiles.unshift(newProfile);
     this.activeTab = 'explore';
+    this.applyLocalFiltersAndSorting();
     this.openProfile(newProfile);
   }
 

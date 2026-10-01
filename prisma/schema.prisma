@@ -1,0 +1,73 @@
+// Prisma schema for Experts Hub
+// Supported Databases: PostgreSQL (Neon / Vercel Postgres) & SQLite
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ExpertProfile {
+  id             String    @id @default(cuid())
+  name           String
+  title          String
+  headline       String
+  category       String
+  avatar         String
+  coverImage     String?
+  location       String
+  rating         Float     @default(5.0)
+  reviewsCount   Int       @default(0)
+  hourlyRate     String
+  bio            String
+  clients        String[]
+  specialties    String[]
+  verified       Boolean   @default(false)
+  featured       Boolean   @default(false)
+  claimed        Boolean   @default(false)
+  sourceUrl      String?
+  
+  // Social links (stored as JSON)
+  linkedin       String?
+  facebook       String?
+  youtube        String?
+  podcast        String?
+  website        String?
+
+  // Media references
+  youtubeVideoId String?
+  podcastTitle   String?
+  podcastUrl     String?
+
+  inquiries      Inquiry[]
+  claims         Claim[]
+
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Inquiry {
+  id            String        @id @default(cuid())
+  profileId     String
+  profile       ExpertProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  clientName    String
+  clientEmail   String
+  organization  String?
+  message       String
+  preferredDate String?
+  createdAt     DateTime      @default(now())
+}
+
+model Claim {
+  id               String        @id @default(cuid())
+  profileId        String
+  profile          ExpertProfile @relation(fields: [profileId], references: [id], onDelete: Cascade)
+  claimantName     String
+  claimantEmail    String
+  verificationLink String?
+  status           String        @default("pending") // pending, approved, rejected
+  createdAt        DateTime      @default(now())
+}

@@ -12,7 +12,7 @@
 
       <nav class="nav-tabs">
         <button [class.active]="activeTab === 'explore'" (click)="activeTab = 'explore'">
-          🔍 Explore Experts Directory
+          🔍 Explore Experts
         </button>
         <button [class.active]="activeTab === 'gather'" (click)="activeTab = 'gather'">
           ✨ Auto-Gather Public Profile
@@ -23,6 +23,16 @@
       </nav>
 
       <div class="nav-actions">
+        <!-- Bookmark / Saved Button -->
+        <button 
+          class="btn-secondary bookmark-tab-btn" 
+          [class.active]="showSavedOnly"
+          (click)="toggleSavedOnlyView()"
+          title="View Saved Experts"
+        >
+          ❤️ Saved ({{ savedExpertIds.size }})
+        </button>
+
         <button class="btn-primary" (click)="showAddModal = true">
           + Add Expert Profile
         </button>
@@ -102,13 +112,24 @@
         </div>
       </section>
 
-      <!-- Profiles Grid Header -->
+      <!-- Profiles Grid Header & Sorting -->
       <div class="results-header">
         <h3>
-          Showing <span class="highlight-count">{{ profiles.length }}</span> Verified Experts
+          Showing <span class="highlight-count">{{ displayedProfiles.length }}</span> Verified Experts
           <span *ngIf="activeCategory !== 'All'">in {{ activeCategory }}</span>
+          <span *ngIf="showSavedOnly" class="saved-filter-tag">(❤️ Saved Only)</span>
         </h3>
-        <span class="live-badge">🟢 Live Data Engine</span>
+
+        <div class="sort-controls">
+          <label class="sort-label">Sort By:</label>
+          <select [(ngModel)]="sortBy" (change)="onSortChange()" class="sort-select">
+            <option value="featured">⭐ Featured First</option>
+            <option value="rating">🔥 Highest Rated</option>
+            <option value="reviews">💬 Most Reviewed</option>
+            <option value="name">🔤 Name (A-Z)</option>
+          </select>
+          <span class="live-badge">🟢 Live Data Engine</span>
+        </div>
       </div>
 
       <!-- Loading State -->
@@ -118,13 +139,23 @@
       </div>
 
       <!-- Experts Grid -->
-      <div *ngIf="!isLoading && profiles.length" class="profiles-grid">
+      <div *ngIf="!isLoading && displayedProfiles.length" class="profiles-grid">
         <div 
-          *ngFor="let profile of profiles" 
+          *ngFor="let profile of displayedProfiles" 
           class="expert-card glass-panel glass-panel-interactive animate-fade"
           (click)="openProfile(profile)"
         >
-          <!-- Featured Badge -->
+          <!-- Bookmark / Save Button -->
+          <button 
+            class="bookmark-card-btn" 
+            [class.saved]="isSaved(profile.id)"
+            (click)="toggleSaveExpert(profile.id, $event)"
+            title="Bookmark Expert"
+          >
+            {{ isSaved(profile.id) ? '❤️' : '🤍' }}
+          </button>
+
+          <!-- Featured Ribbon -->
           <span *ngIf="profile.featured" class="featured-ribbon">⭐ FEATURED</span>
 
           <!-- Card Header Avatar & Category -->
@@ -172,11 +203,11 @@
       </div>
 
       <!-- Empty State -->
-      <div *ngIf="!isLoading && !profiles.length" class="empty-state glass-panel">
+      <div *ngIf="!isLoading && !displayedProfiles.length" class="empty-state glass-panel">
         <span class="empty-icon">🔎</span>
         <h3>No Experts Match Your Filter</h3>
-        <p>Try clearing your search query or client filter to discover more leaders.</p>
-        <button class="btn-secondary" (click)="activeCategory = 'All'; searchQuery = ''; selectedClientFilter = ''; loadProfiles()">Reset Filters</button>
+        <p>Try clearing your search query, sorting, or saved filter to discover more leaders.</p>
+        <button class="btn-secondary" (click)="activeCategory = 'All'; searchQuery = ''; selectedClientFilter = ''; showSavedOnly = false; loadProfiles()">Reset Filters</button>
       </div>
     </ng-container>
 

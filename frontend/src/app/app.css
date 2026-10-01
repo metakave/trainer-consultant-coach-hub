@@ -85,6 +85,23 @@
   border: 1px solid rgba(99, 102, 241, 0.4);
 }
 
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.bookmark-tab-btn {
+  background: rgba(244, 114, 182, 0.1);
+  border-color: rgba(244, 114, 182, 0.3);
+  color: #F472B6;
+}
+.bookmark-tab-btn.active {
+  background: rgba(244, 114, 182, 0.25);
+  border-color: #F472B6;
+  color: white;
+}
+
 .main-content {
   max-width: 1400px;
   width: 100%;
@@ -258,18 +275,54 @@
   color: #34D399;
 }
 
-/* Results Header */
+/* Results Header & Sorting */
 .results-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 14px;
 }
 
 .results-header h3 {
   font-size: 1.3rem;
   color: #F8FAFC;
   font-family: var(--font-heading);
+}
+
+.saved-filter-tag {
+  color: #F472B6;
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin-left: 6px;
+}
+
+.sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sort-label {
+  font-size: 0.85rem;
+  color: #94A3B8;
+  font-weight: 600;
+}
+
+.sort-select {
+  background: #090D16;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: white;
+  padding: 6px 14px;
+  border-radius: 10px;
+  font-size: 0.88rem;
+  outline: none;
+  cursor: pointer;
+}
+
+.sort-select:focus {
+  border-color: #6366F1;
 }
 
 .highlight-count {
@@ -303,6 +356,34 @@
   cursor: pointer;
 }
 
+.bookmark-card-btn {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 2;
+}
+
+.bookmark-card-btn:hover {
+  transform: scale(1.15);
+  background: rgba(244, 114, 182, 0.2);
+}
+
+.bookmark-card-btn.saved {
+  background: rgba(244, 114, 182, 0.3);
+  border-color: #F472B6;
+}
+
 .featured-ribbon {
   position: absolute;
   top: 16px;
@@ -321,6 +402,7 @@
   gap: 16px;
   align-items: flex-start;
   margin-bottom: 14px;
+  margin-top: 10px;
 }
 
 .card-avatar {
